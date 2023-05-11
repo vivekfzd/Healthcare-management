@@ -13,40 +13,58 @@ import (
 func (hc *HealthcareContract) createMedicalRecord(stub shim.ChaincodeStubInterface, args[] string) peer.Response {
 	
 	if len(args) != 5 {
-		return shim.Error("Incorrect number of arguments. Expecting 6.")
+		return shim.Error("Incorrect number of arguments. Expecting 5.")
 	}
 
-	args[0] = "M" + args[0]
-	args[1] = "P" + args[1]
-	args[2] = "D" + args[2]
-
 	//medical data shouldn't exist
-    exists, err := stub.GetState(args[0])
+    medicalRecordJSON, err := stub.GetState(args[0])
     if err != nil {
         return shim.Error(err.Error())
     }
-    if exists != nil {
+    if medicalRecordJSON != nil {
         return shim.Error(fmt.Sprintf("the medical record with ID %s already exists", args[0]))
     }
 
 	//patient should exist
-	exists, err = stub.GetState(args[1])
+	patientJSON, err := stub.GetState(args[1])
     if err != nil {
         return shim.Error(err.Error())
     }
-    if exists == nil {
+    if patientJSON == nil {
         return shim.Error(fmt.Sprintf("Patient is not exist for %s id so, unable to create medical record", args[1]))
     }
 
 	//doctor should exist
-	exists, err = stub.GetState(args[2])
+	doctorJSON, err := stub.GetState(args[2])
     if err != nil {
         return shim.Error(err.Error())
     }
-    if exists == nil {
+    if doctorJSON == nil {
         return shim.Error(fmt.Sprintf("Doctor is not exist for %s id so, unable to create medical record", args[2]))
     }
 
+	//check the acceess
+
+	// Unmarshal the patient object from JSON
+	var patient Patient
+	err = json.Unmarshal(patientJSON, &patient)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+    
+	//go to the write access and check
+	var access bool
+
+	for _,e := range(patient.Write) {
+		if e==args[2] {
+			access = true
+			break
+		}
+	}
+	
+	if !access {
+		return shim.Error(fmt.Sprintf("This %d is not acess to create the medical records",args[2]))
+	}
 
 	medicalRecord := MedicalRecord{
 		ID : args[0],
@@ -56,7 +74,7 @@ func (hc *HealthcareContract) createMedicalRecord(stub shim.ChaincodeStubInterfa
 		Prescription : args[4],
 	}
 
-    medicalRecordJSON, err := json.Marshal(medicalRecord)
+    medicalRecordJSON, err = json.Marshal(medicalRecord)
     if err != nil {
         return shim.Error(err.Error())
     }
@@ -68,32 +86,17 @@ func (hc *HealthcareContract) createMedicalRecord(stub shim.ChaincodeStubInterfa
         return shim.Error(err.Error())
     }
 
-	// Retrieve the patient from the ledger
-	patientJSON, err := stub.GetState(args[1])
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	if patientJSON == nil {
-		return shim.Error("Patient not found.")
-	}
-
-	// Unmarshal the patient object from JSON
-	var patientRecord Patient
-	err = json.Unmarshal(patientJSON, &patientRecord)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-    
-	patientRecord.RecordIDs = append(patientRecord.RecordIDs, recordID)
+	
+	patient.RecordIDs = append(patient.RecordIDs, recordID)
     
 	// Marshal the patient object to JSON
-	patientJSON, err = json.Marshal(patientRecord)
+	patientJSON, err = json.Marshal(patient)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
 	// Store the updated patient in the ledger
-	err = stub.PutState(patientRecord.ID, patientJSON)
+	err = stub.PutState(patient.ID, patientJSON)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -108,9 +111,6 @@ func (hc *HealthcareContract) deleteMedicalRecord(stub shim.ChaincodeStubInterfa
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2.")
 	}
-
-	args[0] = "P" + args[0]
-	args[1] = "M" + args[1]
 
 	//patient should exist
 	exists, err := stub.GetState(args[0])
@@ -190,7 +190,7 @@ func (hc *HealthcareContract) getAllMedicalRecordByPatientId(stub shim.Chaincode
 		return shim.Error("Incorrect number of arguments. Expecting 1.")
 	}
 
-	args[0] = "P" + args[0]
+	
 	// Retrieve the patient from the ledger
 	patientJSON, err := stub.GetState(args[0])
 	if err != nil {
@@ -238,14 +238,14 @@ func (hc *HealthcareContract) getAllMedicalRecordByPatientId(stub shim.Chaincode
 }
 
 
-//patient Id , entity type , entity id
+//patient Id , entity id
 func (hc *HealthcareContract) getAllMedicalRecordByPatientIdWithAccess(stub shim.ChaincodeStubInterface, args[] string) peer.Response {
 
 	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 3.")
 	}
 
-	args[0] = "P" + args[0]
+	
 	// Retrieve the patient from the ledger
 	patientJSON, err := stub.GetState(args[0])
 	if err != nil {
@@ -261,12 +261,7 @@ func (hc *HealthcareContract) getAllMedicalRecordByPatientIdWithAccess(stub shim
 		return shim.Error(err.Error())
 	}
 
-	//entity is exist or not
-	if(args[1]=="Doctor") {
-		args[2] = "D" + args[2]
-	}
-
-	//check access
+	//check read access
 	var access bool
 
 	for _,e := range(patient.Read) {
@@ -286,8 +281,8 @@ func (hc *HealthcareContract) getAllMedicalRecordByPatientIdWithAccess(stub shim
 	return shim.Success([]byte(string(queryResult.Payload)))
 }
 
+
 func (hc *HealthcareContract) getMedicalRecordById(stub shim.ChaincodeStubInterface, args[] string) peer.Response {
-	args[0] = "M" + args[0]
 	
 	medicalRecordJSON, err := stub.GetState(args[0])
 	if err != nil {

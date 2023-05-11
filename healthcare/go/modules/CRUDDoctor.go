@@ -12,7 +12,7 @@ func (hc *HealthcareContract) createDoctor(stub shim.ChaincodeStubInterface, arg
 	if len(args) != 4 {
 		return shim.Error("Incorrect number of arguments. Expecting 4.")
 	}
-	args[0] = "D" + args[0]
+	
 	exists, err := stub.GetState(args[0])
     if err != nil {
         return shim.Error(err.Error())
@@ -49,7 +49,7 @@ func (hc *HealthcareContract) getDoctor(stub shim.ChaincodeStubInterface, args [
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1.")
 	}
-	args[0] = "D" + args[0]
+	
 	// Retrieve the doctor from the ledger
 	doctorJSON, err := stub.GetState(args[0])
 	if err != nil {
@@ -81,7 +81,7 @@ func (hc *HealthcareContract) updateDoctor(stub shim.ChaincodeStubInterface, arg
 	if len(args) != 4 {
 		return shim.Error("Incorrect number of arguments. Expecting 4.")
 	}
-	args[0] = "D" + args[0]
+	
 	// Retrieve the doctor from the ledger
 	doctorJSON, err := stub.GetState(args[0])
 	if err != nil {
@@ -124,7 +124,7 @@ func (hc *HealthcareContract) deleteDoctor(stub shim.ChaincodeStubInterface, arg
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1.")
 	}
-	args[0] = "D" + args[0]
+	
 	// Retrieve the doctor from the ledger
 	doctorJSON, err := stub.GetState(args[0])
 	if err != nil {

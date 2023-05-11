@@ -26,15 +26,6 @@ type Doctor struct {
 	PhoneNumber string `json:"phoneNumber"`
 }
 
-// Define the medical record structure
-// type MedicalRecord struct {
-// 	ID         string   `json:"id"`
-// 	PatientID  string   `json:"patientId"`
-// 	DoctorID   string   `json:"doctorId"`
-// 	Date       string   `json:"date"`
-// 	Diagnosis  string   `json:"diagnosis"`
-// 	Treatments []string `json:"treatments"`
-// }
 
 // Define the medical record structure
 type MedicalRecord struct {
@@ -43,4 +34,17 @@ type MedicalRecord struct {
     DoctorID         string `json:"doctorID"`
     Date             string `json:"date"`
     Prescription     string `json:"prescription"`
+}
+
+// Define the lab technician structure
+type LabTechnician struct {
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+}
+
+// Define the lab insuarance structure
+type InsuranceCompany struct {
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	Company          string `json:"company"`
 }
