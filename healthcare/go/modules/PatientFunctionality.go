@@ -20,6 +20,8 @@ func (hc *HealthcareContract) patientFunctionality(stub shim.ChaincodeStubInterf
 	args = args[1:]
 
 	switch function {
+		case "getPatient":
+			return hc.getPatient(stub,args)
 		case "readMedicalRecords":
 			return hc.getAllMedicalRecordByPatientId(stub, args)
 		case "grantReadAccess":
@@ -27,7 +29,7 @@ func (hc *HealthcareContract) patientFunctionality(stub shim.ChaincodeStubInterf
 		case "revokeReadAccess":
 			return hc.revokeReadAccess(stub, args)
 		case "grantWriteAccess":
-			return hc.grantReadAccess(stub, args)
+			return hc.grantWriteAccess(stub, args)
 		case "revokeWriteAccess":
 			return hc.revokeWriteAccess(stub, args)
 		case "deleteMedicalRecords":

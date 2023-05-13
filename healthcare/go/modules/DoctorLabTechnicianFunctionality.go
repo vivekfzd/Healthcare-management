@@ -22,6 +22,6 @@ func (hc *HealthcareContract) doctorLabTechnicianFunctionality(stub shim.Chainco
 		case "readMedicalRecords":
 			return hc.getAllMedicalRecordByPatientIdWithAccess(stub, args)
 		default:
-			return shim.Error("Patient Function is not valid")
+			return shim.Error("Entity Function is not valid")
 	}
 }

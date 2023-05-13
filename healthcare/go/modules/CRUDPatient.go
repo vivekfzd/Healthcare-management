@@ -147,6 +147,22 @@ func (hc *HealthcareContract) deletePatient(stub shim.ChaincodeStubInterface, ar
 	if patientJSON == nil {
 		return shim.Error("Patient not found.")
 	}
+
+	//unmarshal the patient json
+	var patient Patient
+	err = json.Unmarshal(patientJSON, &patient)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	//Delete all the medical records of the patient
+	for _,record := range(patient.RecordIDs) {
+		err = stub.DelState(record)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+	}
+
 	// Delete the patient from the ledger
 	err = stub.DelState(args[0])
 	if err != nil {

@@ -182,7 +182,7 @@ func (hc *HealthcareContract) grantWriteAccess(stub shim.ChaincodeStubInterface,
 	}
 
 	if found {
-		return shim.Error(fmt.Sprintf("%s Id is also have read access",args[1]))
+		return shim.Error(fmt.Sprintf("%s Id is also have write access",args[1]))
 	} else {
 		patient.Write = append(patient.Write,args[1])
 		// Marshal the patient object to JSON
@@ -200,7 +200,7 @@ func (hc *HealthcareContract) grantWriteAccess(stub shim.ChaincodeStubInterface,
 	}
 
 	// Return a success response
-	return shim.Success([]byte(fmt.Sprintf("%s Id has been successfully revoked", args[0])))
+	return shim.Success([]byte(fmt.Sprintf("%s Id has been successfully inserted", args[0])))
 }
 
 //revoke write access

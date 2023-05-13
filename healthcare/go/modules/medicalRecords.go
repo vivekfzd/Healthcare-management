@@ -63,7 +63,7 @@ func (hc *HealthcareContract) createMedicalRecord(stub shim.ChaincodeStubInterfa
 	}
 	
 	if !access {
-		return shim.Error(fmt.Sprintf("This %d is not acess to create the medical records",args[2]))
+		return shim.Error(fmt.Sprintf("This %s is not acess to create the medical records",args[2]))
 	}
 
 	medicalRecord := MedicalRecord{
