@@ -38,7 +38,7 @@ change the batch timeout is 0.25 sec in channel1_configration.json file
 ./minifab ccup -n healthcare -l go -v 2.0
 
 -----------------------------------------------------------------------------------------
-## create patien command
+## create patient command
 create Patient
 ./minifab invoke -p '"Admin","createPatient","P1","vivek","23","M","O","balla","000000000"'
 
