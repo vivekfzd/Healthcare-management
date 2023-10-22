@@ -1,3 +1,6 @@
+## Install vagrant
+sudo apt install vagrant 
+
 ## download the minifab images in linux
 mkdir -p ~/mywork && cd ~/mywork && curl -o minifab -sL https://tinyurl.com/yxa2q6yr && chmod +x minifab
 
